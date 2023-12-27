@@ -41,3 +41,40 @@ export const createTweet = async (req,res) => {
         res.status(422).send({data: null, message: 'Unable to process your request'})
     }
 }
+
+
+// GET User
+export const getUser = async (req,res) => {
+  const token = {
+      key: process.env.ACCESS_TOKEN,
+      secret: process.env.ACCESS_TOKEN_SECRET
+  }
+
+    const url = 'https://api.twitter.com/2/users/me';
+
+    const headers = oauth.toHeader(oauth.authorize({
+        url,
+        method: 'GET'
+    }, token));
+
+    try {
+        
+        const result = await got.get(url, {
+          responseType: 'json',
+          headers: {
+            Authorization: headers["Authorization"],
+            'user-agent': "v2CreateTweetJS",
+            'content-type': "application/json",
+            'accept': "application/json"
+          }
+        });
+        if (result.body) {
+          res.status(200).send({data: result.body.data})
+          
+        } else {
+          throw new Error('Unsuccessful request');
+        }
+    } catch (error) {
+        res.status(422).send({data: null, message: 'Unable to process your request'})
+    }
+}
